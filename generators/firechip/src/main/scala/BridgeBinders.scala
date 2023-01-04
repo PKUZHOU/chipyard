@@ -242,3 +242,15 @@ class WithDefaultFireSimBridges extends Config(
   new WithTracerVBridge ++
   new WithFireSimIOCellModels
 )
+
+// Remove TracerVBridge due to an unfixed bug on Vitis
+class WithDefaultFireSimBridgesNoTracer extends Config(
+  new WithSerialBridge ++
+  new WithNICBridge ++
+  new WithUARTBridge ++
+  new WithBlockDeviceBridge ++
+  new WithFASEDBridge ++
+  new WithFireSimMultiCycleRegfile ++
+  new WithFireSimFAME5 ++
+  new WithFireSimIOCellModels
+)
