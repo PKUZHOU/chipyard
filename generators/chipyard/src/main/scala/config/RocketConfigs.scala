@@ -258,6 +258,7 @@ class MulticlockAXIOverSerialConfig extends Config(
 // DOC include end: MulticlockAXIOverSerialConfig
 
 class FireNMPRocketConfig extends Config(
-  new firenmp.WithNMPAgent ++                            // use Gemmini systolic array GEMM accelerator
+  new freechips.rocketchip.subsystem.WithDefaultMMIOPort ++
+  new firenmp.WithNMPAgent ++                   
   new freechips.rocketchip.subsystem.WithNBigCores(1) ++
   new chipyard.config.AbstractConfig)
