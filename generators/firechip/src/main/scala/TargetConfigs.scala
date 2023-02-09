@@ -258,3 +258,12 @@ class FireSimNoMemPortConfig extends Config(
   new testchipip.WithBackingScratchpad ++
   new WithFireSimConfigTweaks ++
   new chipyard.RocketConfig)
+
+//******************************************************************
+// FireNMP config, base off chipyard's GemminiRocketConfig
+//******************************************************************
+class FireSimFireNMPRocketConfig extends Config(
+  new WithDefaultFireNMPBridges ++
+  new WithDefaultMemModel ++
+  new WithFireSimConfigTweaks ++
+  new chipyard.FireNMPRocketConfig)

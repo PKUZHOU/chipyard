@@ -258,6 +258,7 @@ class MulticlockAXIOverSerialConfig extends Config(
 // DOC include end: MulticlockAXIOverSerialConfig
 
 class FireNMPRocketConfig extends Config(
+  new freechips.rocketchip.subsystem.WithExtMemSbusBypass ++
   new freechips.rocketchip.subsystem.WithDefaultMMIOPort ++
   new firenmp.WithNMPAgent ++                   
   new freechips.rocketchip.subsystem.WithNBigCores(1) ++

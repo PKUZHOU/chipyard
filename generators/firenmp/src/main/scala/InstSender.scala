@@ -23,7 +23,7 @@ class NMPInstSender()(implicit p: Parameters) extends LazyModule{
       val send_done = Output(Bool())
     })
     // cbus addr of the sifive l2 cache controller
-    val mc_addr =  0x60000000 + 0x200 // TODO: dertermine mc addr automatically 
+    val mc_addr =  0x1080000000L + 0x200 // TODO: dertermine mc addr automatically 
     val in_cmd = Reg(new FireNMPCmd)
 
     // state machine
