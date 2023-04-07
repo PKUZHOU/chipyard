@@ -1,0 +1,10 @@
+{
+    "name" : "nmp-test",
+    "base" : "bare-base.json",
+    "host-init" : "build.sh",
+    "bin" : "firenmp_test.riscv",
+    "workdir" : ".",
+    "testing" : {
+        "refDir" : "refOutput"
+    }
+}
