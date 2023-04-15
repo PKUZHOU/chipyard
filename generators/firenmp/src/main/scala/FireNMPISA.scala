@@ -11,6 +11,7 @@ object FireNMPISA {
     val WR_CMD = 2.U   // Write data from PE buffer to bank  
     val ADD_CMD = 3.U  // Vec_out = Vec_A (in PE buffer) + Vec_B (in bank)
     val MAC_CMD = 4.U  // out = Vec_A (in PE buffer) * Vec_B (from bank)
+    val GET_CMD = 5.U
 
     //====================
     //

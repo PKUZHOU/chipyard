@@ -3,28 +3,33 @@ package  firenmp
 
 import chisel3._ 
 import chisel3.util._ // MuxCase
-import testchipip.{TLHelper}
-import freechips.rocketchip.tilelink.{TLMasterParameters}
+import freechips.rocketchip.tilelink._
 import sifive.blocks.inclusivecache._ // L2 Control
 import freechips.rocketchip.diplomacy._ // LazyModule
 import freechips.rocketchip.config._
+import freechips.rocketchip.tilelink.BroadcastFilter
 
 
-class CLFlushClient()(implicit p: Parameters) extends LazyModule{
+
+
+class CLFlushClient(implicit p: Parameters) extends LazyModule{
   // create a tilelink client node
-  val node = TLHelper.makeClientNode(TLMasterParameters.v1(
+  val node = TLClientNode(Seq(TLMasterPortParameters.v1(Seq(TLMasterParameters.v1(
     name = "clflush-client",
     sourceId = IdRange(0, 1) // currently, it supports one transaction each time 
-  ))
-  lazy val module = new LazyModuleImp(this) {
-    val (tl, edge) = node.out(0)
-    val io = IO(new Bundle{
+  )))))
+  lazy val module = new CLFlushClientImp(this) 
+}
+
+class CLFlushClientImp (outer: CLFlushClient)(implicit p: Parameters) extends  LazyModuleImp(outer){
+  val io = IO(new Bundle{
       // input is the flush address
       val flush_addr = Flipped(Decoupled(UInt(64.W)))
       // output is a flush done signal
       val flush_done = Output(Bool())
     })
-    // cbus addr of the sifive l2 cache controller
+  val (tl, edge) = outer.node.out(0)
+  // cbus addr of the sifive l2 cache controller
     val cache_ctrl_addr = InclusiveCacheParameters.L2ControlAddress + 0x200 // flush64 offset
     val flush_addr = Reg(UInt(64.W))
     // state machine
@@ -57,7 +62,11 @@ class CLFlushClient()(implicit p: Parameters) extends LazyModule{
     when (tl.d.fire) {
       state := s_done
       in_ready := true.B // now can recieve another inst
-    } 
+    }
     io.flush_done := state === s_done
+
+    when(io.flush_done){
+      state := s_init
+    }
   }
-}
+
