@@ -88,7 +88,8 @@ class WithFireSimDesignTweaks extends Config(
   // Optional: Adds IO to attach tracerV bridges
   new chipyard.config.WithTraceIO ++
   // Optional: Request 16 GiB of target-DRAM by default (can safely request up to 32 GiB on F1)
-  new freechips.rocketchip.subsystem.WithExtMemSize((1 << 30) * 16L) ++
+  new freechips.rocketchip.subsystem.WithExtMemSize((1 << 30) * 32L) ++
+  new WithNMemoryChannels(2) ++
   // Optional: Removing this will require using an initramfs under linux
   new testchipip.WithBlockDevice
 )
