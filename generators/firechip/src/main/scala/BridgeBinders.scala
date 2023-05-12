@@ -160,9 +160,14 @@ class WithAXIOverSerialTLCombinedBridges extends OverrideHarnessBinder({
 class WithFASEDBridge extends OverrideHarnessBinder({
   (system: CanHaveMasterAXI4MemPort, th: FireSim, ports: Seq[ClockedAndResetIO[AXI4Bundle]]) => {
     implicit val p: Parameters = GetSystemParameters(system)
+    var max_addr_width = 0
+    (ports zip system.memAXI4Node.edges.in).map { case (axi4, edge) =>
+      max_addr_width = axi4.bits.ar.bits.addr.getWidth.max(max_addr_width)
+    }
+
     (ports zip system.memAXI4Node.edges.in).map { case (axi4, edge) =>
       val nastiKey = NastiParameters(axi4.bits.r.bits.data.getWidth,
-                                     axi4.bits.ar.bits.addr.getWidth,
+                                     max_addr_width,
                                      axi4.bits.ar.bits.id.getWidth)
       system match {
         case s: BaseSubsystem => FASEDBridge(axi4.clock, axi4.bits, axi4.reset.asBool,
