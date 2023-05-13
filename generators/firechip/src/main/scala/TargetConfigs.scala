@@ -55,6 +55,23 @@ class DDR3FCFS extends FCFS16GBQuadRank
 class DDR3FRFCFS extends FRFCFS16GBQuadRank
 class DDR3FRFCFSLLC4MB extends FRFCFS16GBQuadRankLLC4MB
 
+// Config memory channels
+class With2MemChannels extends Config(
+  new WithNMemoryChannels(2)
+)
+
+class With4MemChannels extends Config(
+  new WithNMemoryChannels(4)
+)
+
+class With64GBMem extends Config(
+    new freechips.rocketchip.subsystem.WithExtMemSize((1 << 30) * 64L)
+)
+
+class With32GBMem extends Config(
+    new freechips.rocketchip.subsystem.WithExtMemSize((1 << 30) * 32L)
+)
+
 class WithNIC extends icenet.WithIceNIC(inBufFlits = 8192, ctrlQueueDepth = 64)
 
 // Adds a small/large NVDLA to the system
@@ -88,8 +105,7 @@ class WithFireSimDesignTweaks extends Config(
   // Optional: Adds IO to attach tracerV bridges
   new chipyard.config.WithTraceIO ++
   // Optional: Request 16 GiB of target-DRAM by default (can safely request up to 32 GiB on F1)
-  new freechips.rocketchip.subsystem.WithExtMemSize((1 << 30) * 64L) ++
-  new WithNMemoryChannels(4) ++
+  new freechips.rocketchip.subsystem.WithExtMemSize((1 << 30) * 16L) ++
   // Optional: Removing this will require using an initramfs under linux
   new testchipip.WithBlockDevice
 )
