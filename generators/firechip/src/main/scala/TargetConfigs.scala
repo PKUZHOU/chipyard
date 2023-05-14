@@ -72,6 +72,13 @@ class With32GBMem extends Config(
     new freechips.rocketchip.subsystem.WithExtMemSize((1 << 30) * 32L)
 )
 
+class SimpleCXLConfig extends Config(
+  new With2MemChannels ++
+  new With64GBMem ++ // 64GB total memory
+  new freechips.rocketchip.subsystem.WithRemoteMemChannels(1) ++
+  new freechips.rocketchip.subsystem.WithRemoteMemSize((1 << 30) * 48L) // 48GB CXL memory
+)
+
 class WithNIC extends icenet.WithIceNIC(inBufFlits = 8192, ctrlQueueDepth = 64)
 
 // Adds a small/large NVDLA to the system
