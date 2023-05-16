@@ -54,7 +54,7 @@ class WithScalaTestFeatures extends Config((site, here, up) => {
 class DDR3FCFS extends FCFS16GBQuadRank
 class DDR3FRFCFS extends FRFCFS16GBQuadRank
 class DDR3FRFCFSLLC4MB extends FRFCFS16GBQuadRankLLC4MB
-
+class LBPLLC4MB extends LBP32R32WLLC4MB
 // Config memory channels
 class With2MemChannels extends Config(
   new WithNMemoryChannels(2)
@@ -77,6 +77,13 @@ class SimpleCXLConfig extends Config(
   new With64GBMem ++ // 64GB total memory
   new freechips.rocketchip.subsystem.WithRemoteMemChannels(1) ++
   new freechips.rocketchip.subsystem.WithRemoteMemSize((1 << 30) * 48L) // 48GB CXL memory
+)
+
+class SimpleCXLConfig32G extends Config(
+  new With2MemChannels ++
+  new With32GBMem ++ // 32GB total memory
+  new freechips.rocketchip.subsystem.WithRemoteMemChannels(1) ++
+  new freechips.rocketchip.subsystem.WithRemoteMemSize((1 << 30) * 24L) // 24GB CXL memory
 )
 
 class WithNIC extends icenet.WithIceNIC(inBufFlits = 8192, ctrlQueueDepth = 64)
@@ -215,6 +222,12 @@ class FireSimQuadRocketConfig extends Config(
   new WithDefaultMemModel ++
   new WithFireSimConfigTweaks ++
   new chipyard.QuadRocketConfig)
+
+class FireSimEightRocketConfig extends Config(
+  new WithDefaultFireSimBridges ++
+  new WithDefaultMemModel ++
+  new WithFireSimConfigTweaks ++
+  new chipyard.EightRocketConfig)
 
 // A stripped down configuration that should fit on all supported hosts.
 // Flat to avoid having to reorganize the config class hierarchy to remove certain features

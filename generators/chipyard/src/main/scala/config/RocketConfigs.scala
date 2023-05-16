@@ -38,6 +38,10 @@ class QuadRocketConfig extends Config(
   new freechips.rocketchip.subsystem.WithNBigCores(4) ++    // quad-core (4 RocketTiles)
   new chipyard.config.AbstractConfig)
 
+class EightRocketConfig extends Config(
+  new freechips.rocketchip.subsystem.WithNBigCores(8) ++    // octa-core (8 RocketTiles)
+  new chipyard.config.AbstractConfig)
+
 class Cloned64RocketConfig extends Config(
   new freechips.rocketchip.subsystem.WithCloneRocketTiles(63, 0) ++ // copy tile0 63 more times
   new freechips.rocketchip.subsystem.WithNBigCores(1) ++            // tile0 is a BigRocket
