@@ -229,6 +229,14 @@ class FireSimEightRocketConfig extends Config(
   new WithFireSimConfigTweaks ++
   new chipyard.EightRocketConfig)
 
+class FireSimQuadSmallBoomConfig extends Config(
+  new WithDefaultFireSimBridges ++
+  new WithDefaultMemModel ++
+  new WithFireSimConfigTweaks ++
+  new boom.common.WithNSmallBooms(4) ++
+  new chipyard.config.AbstractConfig
+)
+
 // A stripped down configuration that should fit on all supported hosts.
 // Flat to avoid having to reorganize the config class hierarchy to remove certain features
 class FireSimSmallSystemConfig extends Config(
