@@ -1,0 +1,10 @@
+{
+    "name" : "cmsketch-test",
+    "base" : "bare-base.json",
+    "host-init" : "build.sh",
+    "bin" : "cmsketch_test.riscv",
+    "workdir" : ".",
+    "testing" : {
+        "refDir" : "refOutput"
+    }
+}

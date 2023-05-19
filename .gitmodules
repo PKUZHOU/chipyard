@@ -51,7 +51,8 @@
 	url = https://github.com/ucb-bar/gemmini
 [submodule "software/firemarshal"]
 	path = software/firemarshal
-	url = https://github.com/firesim/FireMarshal.git
+	url = git@github.com:PKUZHOU/FireMarshal.git
+	branch = neomem
 [submodule "generators/cva6"]
 	path = generators/cva6
 	url = https://github.com/ucb-bar/cva6-wrapper.git

@@ -32,6 +32,7 @@ import barstools.iocell.chisel._
 import chipyard.iobinders.{IOBinders, OverrideIOBinder, ComposeIOBinder, GetSystemParameters, IOCellKey}
 import chipyard.{HasHarnessSignalReferences}
 import chipyard.harness._
+import midas.models.FASEDBridgeWithCMsketch
 
 object MainMemoryConsts {
   val regionNamePrefix = "MainMemory"
@@ -182,6 +183,26 @@ class WithFASEDBridge extends OverrideHarnessBinder({
   }
 })
 
+class WithFASEDBridgeWithCMsketch extends OverrideHarnessBinder({
+  (system: CanHaveMasterAXI4MemPort, th: FireSim, ports: Seq[ClockedAndResetIO[AXI4Bundle]]) => {
+    implicit val p: Parameters = GetSystemParameters(system)
+    (ports zip system.memAXI4Node.edges.in).map { case (axi4, edge) =>
+      val nastiKey = NastiParameters(axi4.bits.r.bits.data.getWidth,
+                                     axi4.bits.ar.bits.addr.getWidth,
+                                     axi4.bits.ar.bits.id.getWidth)
+      system match {
+        case s: BaseSubsystem => FASEDBridgeWithCMsketch(axi4.clock, axi4.bits, axi4.reset.asBool,
+          CompleteConfig(p(firesim.configs.MemModelKey),
+                         nastiKey,
+                         Some(AXI4EdgeSummary(edge)),
+                         Some(MainMemoryConsts.globalName)))
+        case _ => throw new Exception("Attempting to attach FASED Bridge to misconfigured design")
+      }
+    }
+    Nil
+  }
+})
+
 class WithTracerVBridge extends ComposeHarnessBinder({
   (system: CanHaveTraceIOModuleImp, th: FireSim, ports: Seq[TraceOutputTop]) => {
     ports.map { p => p.traces.map(tileTrace => TracerVBridge(tileTrace)(system.p)) }
@@ -248,12 +269,34 @@ class WithDefaultFireSimBridges extends Config(
   new WithFireSimIOCellModels
 )
 
+class WithDefaultFireSimBridgesWithCMsketch extends Config(
+  new WithSerialBridge ++
+  new WithNICBridge ++
+  new WithUARTBridge ++
+  new WithBlockDeviceBridge ++
+  new WithFASEDBridgeWithCMsketch ++
+  new WithFireSimMultiCycleRegfile ++
+  new WithFireSimFAME5 ++
+  new WithTracerVBridge ++
+  new WithFireSimIOCellModels
+)
+
 // Shorthand to register all of the provided mmio-only bridges above
 class WithDefaultMMIOOnlyFireSimBridges extends Config(
   new WithSerialBridge ++
   new WithUARTBridge ++
   new WithBlockDeviceBridge ++
   new WithFASEDBridge ++
+  new WithFireSimMultiCycleRegfile ++
+  new WithFireSimFAME5 ++
+  new WithFireSimIOCellModels
+)
+
+class WithDefaultMMIOOnlyFireSimBridgesWithCMsketch extends Config(
+  new WithSerialBridge ++
+  new WithUARTBridge ++
+  new WithBlockDeviceBridge ++
+  new WithFASEDBridgeWithCMsketch ++
   new WithFireSimMultiCycleRegfile ++
   new WithFireSimFAME5 ++
   new WithFireSimIOCellModels
