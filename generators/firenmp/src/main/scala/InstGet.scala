@@ -24,7 +24,7 @@ class NMPInstGetImp(outer: NMPInstGet)(implicit p: Parameters) extends LazyModul
       val get_done = Output(Bool())
     })
 
-    val mc_addr = 0x1080100030L
+    val mc_addr = 0x1280100030L
     val in_cmd  = Reg(new(FireNMPCmd))
 
     val s_init :: s_send :: s_resp :: s_done :: Nil = Enum(4)
