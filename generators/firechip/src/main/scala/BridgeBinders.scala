@@ -32,7 +32,7 @@ import barstools.iocell.chisel._
 import chipyard.iobinders.{IOBinders, OverrideIOBinder, ComposeIOBinder, GetSystemParameters, IOCellKey}
 import chipyard.{HasHarnessSignalReferences}
 import chipyard.harness._
-import midas.models.FASEDBridgeWithCMsketch
+import midas.models.FASEDBridgeWithNeoProfiler
 
 object MainMemoryConsts {
   val regionNamePrefix = "MainMemory"
@@ -183,19 +183,38 @@ class WithFASEDBridge extends OverrideHarnessBinder({
   }
 })
 
-class WithFASEDBridgeWithCMsketch extends OverrideHarnessBinder({
+class WithFASEDBridgeWithNeoProfiler extends OverrideHarnessBinder({
   (system: CanHaveMasterAXI4MemPort, th: FireSim, ports: Seq[ClockedAndResetIO[AXI4Bundle]]) => {
     implicit val p: Parameters = GetSystemParameters(system)
+    var max_addr_width = 0
+    (ports zip system.memAXI4Node.edges.in).map { case (axi4, edge) =>
+      max_addr_width = axi4.bits.ar.bits.addr.getWidth.max(max_addr_width)
+    }
+    val memPortParamsOpt = p(ExtMem)
+    val nLocalChannels = memPortParamsOpt.map(_.master.nRemoteChannels).getOrElse(0)
+    var channelIdx = 0
     (ports zip system.memAXI4Node.edges.in).map { case (axi4, edge) =>
       val nastiKey = NastiParameters(axi4.bits.r.bits.data.getWidth,
-                                     axi4.bits.ar.bits.addr.getWidth,
+                                     max_addr_width,
                                      axi4.bits.ar.bits.id.getWidth)
       system match {
-        case s: BaseSubsystem => FASEDBridgeWithCMsketch(axi4.clock, axi4.bits, axi4.reset.asBool,
-          CompleteConfig(p(firesim.configs.MemModelKey),
-                         nastiKey,
-                         Some(AXI4EdgeSummary(edge)),
-                         Some(MainMemoryConsts.globalName)))
+        case s: BaseSubsystem => {
+          if (channelIdx < nLocalChannels){
+            FASEDBridge(axi4.clock, axi4.bits, axi4.reset.asBool,
+              CompleteConfig(p(firesim.configs.MemModelKey),
+                        nastiKey,
+                        Some(AXI4EdgeSummary(edge)),
+                        Some(MainMemoryConsts.globalName)))
+          }
+          else{
+            FASEDBridgeWithNeoProfiler(axi4.clock, axi4.bits, axi4.reset.asBool,
+            CompleteConfig(p(firesim.configs.MemModelKey),
+                        nastiKey,
+                        Some(AXI4EdgeSummary(edge)),
+                        Some(MainMemoryConsts.globalName)))
+          }
+          channelIdx += 1
+        }
         case _ => throw new Exception("Attempting to attach FASED Bridge to misconfigured design")
       }
     }
@@ -269,12 +288,12 @@ class WithDefaultFireSimBridges extends Config(
   new WithFireSimIOCellModels
 )
 
-class WithDefaultFireSimBridgesWithCMsketch extends Config(
+class WithDefaultFireSimBridgesWithNeoProfiler extends Config(
   new WithSerialBridge ++
   new WithNICBridge ++
   new WithUARTBridge ++
   new WithBlockDeviceBridge ++
-  new WithFASEDBridgeWithCMsketch ++
+  new WithFASEDBridgeWithNeoProfiler ++
   new WithFireSimMultiCycleRegfile ++
   new WithFireSimFAME5 ++
   new WithTracerVBridge ++
@@ -292,11 +311,11 @@ class WithDefaultMMIOOnlyFireSimBridges extends Config(
   new WithFireSimIOCellModels
 )
 
-class WithDefaultMMIOOnlyFireSimBridgesWithCMsketch extends Config(
+class WithDefaultMMIOOnlyFireSimBridgesWithNeoProfiler extends Config(
   new WithSerialBridge ++
   new WithUARTBridge ++
   new WithBlockDeviceBridge ++
-  new WithFASEDBridgeWithCMsketch ++
+  new WithFASEDBridgeWithNeoProfiler ++
   new WithFireSimMultiCycleRegfile ++
   new WithFireSimFAME5 ++
   new WithFireSimIOCellModels
