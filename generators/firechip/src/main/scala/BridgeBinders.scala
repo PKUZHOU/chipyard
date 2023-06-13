@@ -191,7 +191,10 @@ class WithFASEDBridgeWithNeoProfiler extends OverrideHarnessBinder({
       max_addr_width = axi4.bits.ar.bits.addr.getWidth.max(max_addr_width)
     }
     val memPortParamsOpt = p(ExtMem)
-    val nLocalChannels = memPortParamsOpt.map(_.master.nRemoteChannels).getOrElse(0)
+    val nRemoteChannels = memPortParamsOpt.map(_.master.nRemoteChannels).getOrElse(0)
+    val nTotalChannels = memPortParamsOpt.map(_.nMemoryChannels).getOrElse(0)
+    val nLocalChannels = nTotalChannels - nRemoteChannels
+    println(s"nLocalChannels: ${nLocalChannels}")
     var channelIdx = 0
     (ports zip system.memAXI4Node.edges.in).map { case (axi4, edge) =>
       val nastiKey = NastiParameters(axi4.bits.r.bits.data.getWidth,
