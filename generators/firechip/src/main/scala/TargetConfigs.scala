@@ -92,9 +92,9 @@ class SimpleCXLConfig32G extends Config(
 
 class SimpleCXLConfig16G extends Config(
   new With2MemChannels ++
-  new With16GBMem ++ // 32GB total memory
+  new With16GBMem ++ // 16GB total memory
   new freechips.rocketchip.subsystem.WithRemoteMemChannels(1) ++
-  new freechips.rocketchip.subsystem.WithRemoteMemSize((1 << 30) * 12L) // 24GB CXL memory
+  new freechips.rocketchip.subsystem.WithRemoteMemSize((1 << 30) * 12L) // 12GB CXL memory
 )
 
 class WithNIC extends icenet.WithIceNIC(inBufFlits = 8192, ctrlQueueDepth = 64)
@@ -364,6 +364,7 @@ class FireSimLeanGemminiRocketMMIOOnlyConfig extends Config(
   new chipyard.LeanGemminiRocketConfig)
 
 class FireSimRocketMMIOOnlyConfigWithNeoProf extends Config(
+  new SimpleCXLConfig16G ++
   new WithDefaultFireSimBridgesWithNeoProfiler ++
   new freechips.rocketchip.subsystem.WithExtMemSbusBypass ++
   new WithDefaultMemModel ++
